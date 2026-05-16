@@ -1,0 +1,272 @@
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+
+class TresEnRaya{
+
+private:
+
+    char tablero[9];
+    string jugador1;
+    string jugador2;
+    char simboloActual;
+
+public:
+
+    TresEnRaya(string nombre1, string nombre2){
+
+        jugador1 = nombre1;
+        jugador2 = nombre2;
+        simboloActual = 'X';
+
+        for(int i = 0; i < 9; i++){
+            tablero[i] = ' ';
+        }
+    }
+
+    void mostrarTablero(){
+
+        cout << endl;
+
+        for(int i = 0; i < 9; i++){
+
+            if(tablero[i] == ' '){
+                cout << " " << i + 1 << " ";
+            }
+            else{
+                cout << " " << tablero[i] << " ";
+            }
+            if(i != 2 and i != 5 and i != 8){
+                cout << "|";
+            }
+            if(i == 2 or i == 5){
+                cout << endl;
+                cout << "---+---+---";
+                cout << endl;
+            }
+        }
+
+        cout << endl << endl;
+    }
+
+    bool colocarFicha(int posicion){
+
+        if(posicion < 1 or posicion > 9){
+            return false;
+        }
+        if(tablero[posicion - 1] != ' '){
+            return false;
+        }
+        tablero[posicion - 1] = simboloActual;
+
+        return true;
+    }
+
+    char verificarGanador(){
+
+        if(tablero[0] == tablero[1] and tablero[1] == tablero[2] and tablero[0] != ' '){
+            return tablero[0];
+        }
+        if(tablero[3] == tablero[4] and tablero[4] == tablero[5] and tablero[3] != ' '){
+            return tablero[3];
+        }
+        if(tablero[6] == tablero[7] and tablero[7] == tablero[8] and tablero[6] != ' '){
+            return tablero[6];
+        }
+        if(tablero[0] == tablero[3] and tablero[3] == tablero[6] and tablero[0] != ' '){
+            return tablero[0];
+        }
+        if(tablero[1] == tablero[4] and tablero[4] == tablero[7] and tablero[1] != ' '){
+            return tablero[1];
+        }
+        if(tablero[2] == tablero[5] and tablero[5] == tablero[8] and tablero[2] != ' '){
+            return tablero[2];
+        }
+        if(tablero[0] == tablero[4] and tablero[4] == tablero[8] and tablero[0] != ' '){
+            return tablero[0];
+        }
+        if(tablero[2] == tablero[4] and tablero[4] == tablero[6] and tablero[2] != ' '){
+            return tablero[2];
+        }
+
+        return ' ';
+    }
+
+    bool tableroLleno(){
+
+        for(int i = 0; i < 9; i++){
+
+            if(tablero[i] == ' '){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    void reiniciar(){
+
+        for(int i = 0; i < 9; i++){
+            tablero[i] = ' ';
+        }
+    }
+
+    void cambiarTurno(){
+
+        if(simboloActual == 'X'){
+            simboloActual = 'O';
+        }
+        else{
+            simboloActual = 'X';
+        }
+    }
+
+    void ponerSimboloActual(char simbolo){
+
+        simboloActual = simbolo;
+    }
+
+    char verSimboloActual(){
+
+        return simboloActual;
+    }
+
+};
+
+void actualizarPuntaje(int* ptrPuntaje){
+
+    *ptrPuntaje = *ptrPuntaje + 1;
+}
+
+int main(){
+
+    srand(time(0));
+
+    string nombre1;
+    string nombre2;
+    int opcion = 0;
+    int posicion;
+    char ganador;
+    char respuesta;
+    int puntaje1 = 0;
+    int puntaje2 = 0;
+    int* ptrPuntaje1 = &puntaje1;
+    int* ptrPuntaje2 = &puntaje2;
+
+    cout << "TRES EN RAYA" << endl;
+    cout << "Jugador 1: ";
+    cin >> nombre1;
+    cout << "Jugador 2: ";
+    cin >> nombre2;
+
+    TresEnRaya juego(nombre1, nombre2);
+
+    while(opcion != 3){
+
+        cout << endl;
+        cout << "1. Jugar" << endl;
+        cout << "2. Ver puntajes" << endl;
+        cout << "3. Salir" << endl;
+        cout << "Opcion: ";
+        cin >> opcion;
+
+        if(cin.fail()){
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Opcion invalida." << endl;
+            opcion = 0;
+            continue;
+        }
+
+        if(opcion == 1){
+
+            respuesta = 's';
+
+            while(respuesta == 's' or respuesta == 'S'){
+
+                juego.reiniciar();
+
+                if(rand() % 2 == 0){
+                    juego.ponerSimboloActual('X');
+                    cout << nombre1 << " comienza con X" << endl;
+                }
+                else{
+                    juego.ponerSimboloActual('O');
+                    cout << nombre2 << " comienza con O" << endl;
+                }
+
+                ganador = ' ';
+
+                while(ganador == ' ' and juego.tableroLleno() == false){
+
+                    juego.mostrarTablero();
+
+                    if(juego.verSimboloActual() == 'X'){
+                        cout << nombre1 << " (X), elige posicion (1-9): ";
+                    }
+                    else{
+                        cout << nombre2 << " (O), elige posicion (1-9): ";
+                    }
+
+                    cin >> posicion;
+
+                    if(cin.fail()){
+                        cin.clear();
+                        cin.ignore(10000, '\n');
+                        cout << "Error: dato invalido." << endl;
+                    }
+                    else{
+                        if(juego.colocarFicha(posicion) == true){
+
+                            ganador = juego.verificarGanador();
+
+                            if(ganador == ' ' and juego.tableroLleno() == false){
+                                juego.cambiarTurno();
+                            }
+                        }
+                        else{
+
+                            if(posicion < 1 or posicion > 9){
+                                cout << "Error: posicion fuera de rango." << endl;
+                            }
+                            else{
+                                cout << "Error: posicion ocupada." << endl;
+                            }
+                        }
+                    }
+                }
+
+                juego.mostrarTablero();
+
+                if(ganador == 'X'){
+                    cout << nombre1 << " GANA!" << endl;
+                    actualizarPuntaje(ptrPuntaje1);
+                }
+                else if(ganador == 'O'){
+                    cout << nombre2 << " GANA!" << endl;
+                    actualizarPuntaje(ptrPuntaje2);
+                }
+                else{
+                    cout << "EMPATE!" << endl;
+                }
+                cout << "Puntajes: " << nombre1 << ": " << puntaje1 << "   " << nombre2 << ": " << puntaje2 << endl;
+
+                cout << "Jugar nuevo? (s/n): ";
+                cin >> respuesta;
+            }
+        }
+        else if(opcion == 2){
+            cout << "Puntajes: " << nombre1 << ": " << puntaje1 << "   " << nombre2 << ": " << puntaje2 << endl;
+        }
+        else if(opcion == 3){
+            cout << "Hasta luego!" << endl;
+        }
+        else{
+            cout << "Opcion invalida." << endl;
+        }
+    }
+
+    return 0;
+}
